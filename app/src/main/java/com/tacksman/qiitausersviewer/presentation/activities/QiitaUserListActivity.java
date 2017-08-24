@@ -15,6 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.MultiTransformation;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.request.RequestOptions;
 import com.tacksman.qiitausersviewer.R;
 import com.tacksman.qiitausersviewer.entity.User;
@@ -24,6 +26,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static com.bumptech.glide.request.RequestOptions.circleCropTransform;
 
 public class QiitaUserListActivity extends AppCompatActivity implements QiitaUserListViewModel.UserFetchSucceededListener,
                                                                         QiitaUserListViewModel.UserFetchFailedListener {
@@ -140,7 +144,9 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
             public void setUserData(User user) {
                 RequestOptions requestOptions = new RequestOptions();
                 requestOptions.placeholder(R.drawable.ic_assignment_ind_grey_400_24dp);
-                requestOptions.placeholder(R.drawable.ic_assignment_ind_grey_400_24dp);
+                requestOptions.error(R.drawable.ic_assignment_ind_grey_400_24dp);
+                requestOptions.centerCrop();
+                requestOptions.circleCrop();
 
                 Glide.with(itemView)
                         .load(user.getProfileImageUrl())
