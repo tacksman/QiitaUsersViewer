@@ -3,6 +3,7 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'com.cookpad.android.licensetools'
 
 android {
     compileSdkVersion 26
@@ -73,7 +74,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-
 
     // Test
     testImplementation 'junit:junit:4.12'
