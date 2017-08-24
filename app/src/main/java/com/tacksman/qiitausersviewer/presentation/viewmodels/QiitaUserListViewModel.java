@@ -28,7 +28,7 @@ public class QiitaUserListViewModel extends ViewModel {
 
     public void fetchUsers() {
         if (lastFetchPageIndex == 100) return;
-        
+
         this.lastFetchPageIndex++;
         this.userRepository.getQiitaUsers(this.lastFetchPageIndex)
                 .subscribe(users -> {

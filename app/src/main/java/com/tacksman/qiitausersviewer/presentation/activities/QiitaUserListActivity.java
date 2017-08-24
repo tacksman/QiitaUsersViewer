@@ -2,24 +2,21 @@ package com.tacksman.qiitausersviewer.presentation.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
-import com.facebook.stetho.common.LogUtil;
 import com.tacksman.qiitausersviewer.R;
 import com.tacksman.qiitausersviewer.entity.User;
 import com.tacksman.qiitausersviewer.presentation.viewmodels.QiitaUserListViewModel;
@@ -36,6 +33,9 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
 
     @BindView(R.id.rv_user_list)
     RecyclerView rvUserList;
+
+    @BindView(R.id.pb_load)
+    ProgressBar pbLoad;
 
     QiitaUserListViewModel viewModel;
     private UserListAdapter adapter;
@@ -56,6 +56,7 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
     @Override
     protected void onResume() {
         super.onResume();
+        pbLoad.setVisibility(View.VISIBLE);
         this.viewModel.fetchUsers();
 
         /**
@@ -71,8 +72,13 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
         rvUserList.addOnScrollListener(new EndlessScrollListener(layoutManager) {
             @Override
             public void onLoadMore() {
-                Log.d("CHECK", "More Load: " + viewModel.getNextPage());
+                pbLoad.setVisibility(View.VISIBLE);
                 viewModel.fetchUsers();
+            }
+
+            @Override
+            public void onLoadFinish() {
+                pbLoad.setVisibility(View.GONE);
             }
         });
         setListDivider();
@@ -86,11 +92,13 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
     @Override
     public void fetchSucceeded(List<User> addedUsers) {
         adapter.update(addedUsers);
+        pbLoad.setVisibility(View.GONE);
     }
 
     @Override
     public void fetchFailed(Throwable throwable) {
         Toast.makeText(this, "ユーザー一覧の取得に失敗しました: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
+        pbLoad.setVisibility(View.GONE);
     }
 
 //    @Override
@@ -128,8 +136,6 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
         @Override
         public void onBindViewHolder(UserViewHolder holder, int position) {
             User user = viewModel.getUsers().get(position);
-            if (!TextUtils.isEmpty(user.getProfileImageUrl())) Log.d("CHECK", String.valueOf(user));
-            Log.d("HOGE", String.valueOf(user));
             holder.setUserData(user);
         }
 
@@ -191,18 +197,20 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
             if (loading) {
                 if (totalItemCount > previousTotal) {
                     loading = false;
+                    onLoadFinish();
                     previousTotal = totalItemCount;
                 }
             }
 
             if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
 
-                onLoadMore();
-
                 loading = true;
+                onLoadMore();
             }
         }
 
         public abstract void onLoadMore();
+
+        public abstract void onLoadFinish();
     }
 }
