@@ -1,2 +1,2 @@
 # QiitaUsersViewer
-Qiita's user list viewer for Android.
+This app is Qiita's users viewer app for Android.
