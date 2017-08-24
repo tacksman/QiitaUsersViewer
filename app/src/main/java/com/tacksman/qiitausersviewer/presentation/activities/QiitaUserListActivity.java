@@ -29,7 +29,10 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class QiitaUserListActivity extends AppCompatActivity implements QiitaUserListViewModel.UserFetchSucceededListener, QiitaUserListViewModel.UserFetchFailedListener {
+public class QiitaUserListActivity extends AppCompatActivity implements QiitaUserListViewModel.UserFetchSucceededListener,
+                                                                        QiitaUserListViewModel.UserFetchFailedListener
+//        , QiitaUserListActivity.OnMoreScrolledListener
+{
 
     @BindView(R.id.rv_user_list)
     RecyclerView rvUserList;
@@ -62,8 +65,16 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
 
         // initialize RecyclerView with adapter
         adapter = new UserListAdapter(this);
-        rvUserList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        rvUserList.setLayoutManager(layoutManager);
         rvUserList.setAdapter(adapter);
+        rvUserList.addOnScrollListener(new EndlessScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore() {
+                Log.d("CHECK", "More Load: " + viewModel.getNextPage());
+                viewModel.fetchUsers();
+            }
+        });
         setListDivider();
     }
 
@@ -74,13 +85,18 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
 
     @Override
     public void fetchSucceeded(List<User> addedUsers) {
-        adapter.update();
+        adapter.update(addedUsers);
     }
 
     @Override
     public void fetchFailed(Throwable throwable) {
         Toast.makeText(this, "ユーザー一覧の取得に失敗しました: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
     }
+
+//    @Override
+//    public void onLoadMore() {
+//        viewModel.fetchUsers();
+//    }
 
     private void setListDivider() {
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvUserList.getContext(),
@@ -96,7 +112,10 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
             this.inflater = LayoutInflater.from(context);
         }
 
-        public void update() {
+        public void update(List<User> addedUsers) {
+            if (!viewModel.getUsers().isEmpty()) {
+                notifyItemMoved(viewModel.getUsers().size() - addedUsers.size(), viewModel.getUsers().size() - 1);
+            }
             notifyDataSetChanged();
         }
 
@@ -145,5 +164,45 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
                 tvUserName.setText(user.getId());
             }
         }
+    }
+
+    public abstract class EndlessScrollListener extends RecyclerView.OnScrollListener {
+
+        int visibleThreshold = 6;
+        int firstVisibleItem, visibleItemCount, totalItemCount;
+        private int previousTotal = 0;
+        private boolean loading = true;
+        private int current_page = 1;
+
+        private LinearLayoutManager mLinearLayoutManager;
+
+        public EndlessScrollListener(LinearLayoutManager linearLayoutManager) {
+            this.mLinearLayoutManager = linearLayoutManager;
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            visibleItemCount = recyclerView.getChildCount();
+            totalItemCount = mLinearLayoutManager.getItemCount();
+            firstVisibleItem = mLinearLayoutManager.findFirstVisibleItemPosition();
+
+            if (loading) {
+                if (totalItemCount > previousTotal) {
+                    loading = false;
+                    previousTotal = totalItemCount;
+                }
+            }
+
+            if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+
+                onLoadMore();
+
+                loading = true;
+            }
+        }
+
+        public abstract void onLoadMore();
     }
 }

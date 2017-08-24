@@ -1,7 +1,6 @@
 package com.tacksman.qiitausersviewer.presentation.viewmodels;
 
 import android.arch.lifecycle.ViewModel;
-import android.util.Log;
 
 import com.tacksman.qiitausersviewer.entity.User;
 import com.tacksman.qiitausersviewer.infrastracture.repositories.UserRepository;
@@ -28,25 +27,18 @@ public class QiitaUserListViewModel extends ViewModel {
     }
 
     public void fetchUsers() {
-
-        if (users.isEmpty()) {
-            userRepository.getQiitaUsers(1)
-                    .subscribe(users -> {
-                                Log.d("HODE", String.valueOf(users));
-                                this.users.addAll(users);
-                                this.lastFetchPageIndex++;
-                                this.fetchSucceededListener.fetchSucceeded(users);
-                            },
-                            throwable -> fetchFailedListener.fetchFailed(throwable));
-        } else {
-            this.userRepository.getQiitaUsers(this.lastFetchPageIndex)
-                    .subscribe(users -> {
-                                this.users.addAll(users);
-                                this.lastFetchPageIndex++;
-                                this.fetchSucceededListener.fetchSucceeded(users);
-                            },
-                            throwable -> fetchFailedListener.fetchFailed(throwable));
-        }
+        if (lastFetchPageIndex == 100) return;
+        
+        this.lastFetchPageIndex++;
+        this.userRepository.getQiitaUsers(this.lastFetchPageIndex)
+                .subscribe(users -> {
+                            this.users.addAll(users);
+                            this.fetchSucceededListener.fetchSucceeded(users);
+                        },
+                        throwable -> {
+                            this.lastFetchPageIndex--;
+                            fetchFailedListener.fetchFailed(throwable);
+                        });
     }
 
     public int getLastFetchPageIndex() {
