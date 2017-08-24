@@ -4,7 +4,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,9 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class QiitaUserListActivity extends AppCompatActivity implements QiitaUserListViewModel.UserFetchSucceededListener,
-                                                                        QiitaUserListViewModel.UserFetchFailedListener
-//        , QiitaUserListActivity.OnMoreScrolledListener
-{
+                                                                        QiitaUserListViewModel.UserFetchFailedListener {
 
     @BindView(R.id.rv_user_list)
     RecyclerView rvUserList;
@@ -59,12 +56,7 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
         pbLoad.setVisibility(View.VISIBLE);
         this.viewModel.fetchUsers();
 
-        /**
-         * Super :shit:
-         */
-//        for (int i = 0; i < 100; i++) this.viewModel.fetchUsers();
-
-        // initialize RecyclerView with adapter
+        /* initialize RecyclerView with adapter */
         adapter = new UserListAdapter(this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         rvUserList.setLayoutManager(layoutManager);
@@ -81,7 +73,6 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
                 pbLoad.setVisibility(View.GONE);
             }
         });
-        setListDivider();
     }
 
     @Override
@@ -99,17 +90,6 @@ public class QiitaUserListActivity extends AppCompatActivity implements QiitaUse
     public void fetchFailed(Throwable throwable) {
         Toast.makeText(this, "ユーザー一覧の取得に失敗しました: " + throwable.getMessage(), Toast.LENGTH_LONG).show();
         pbLoad.setVisibility(View.GONE);
-    }
-
-//    @Override
-//    public void onLoadMore() {
-//        viewModel.fetchUsers();
-//    }
-
-    private void setListDivider() {
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(rvUserList.getContext(),
-                new LinearLayoutManager(this).getOrientation());
-        rvUserList.addItemDecoration(dividerItemDecoration);
     }
 
     public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.UserViewHolder> {

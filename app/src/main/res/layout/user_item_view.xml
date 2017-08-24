@@ -12,7 +12,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:src="@drawable/ic_assignment_ind_grey_400_24dp"
-        />
+        android:contentDescription="@string/users_icon" />
 
     <TextView
         android:id="@+id/tv_user_name"
@@ -21,6 +21,9 @@
         android:layout_gravity="center_vertical"
         android:textSize="16sp"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:maxLines="1"
+        android:ellipsize="end"
         tools:hint="たこやきくん"/>
 
 </LinearLayout>

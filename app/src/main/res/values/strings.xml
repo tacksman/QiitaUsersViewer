@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">QiitaUsersViewer</string>
+    <string name="users_icon">ユーザーアイコン</string>
 </resources>

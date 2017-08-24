@@ -1,27 +1,57 @@
 package com.tacksman.qiitausersviewer.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 // Qiita User Entity
-public class User {
+public class User implements Parcelable {
 
     @SerializedName("description")
     private String description;
+
+    @SerializedName("facebook_id")
     private String facebookId;
+
+    @SerializedName("followees_count")
     private int followeesCount;
+
+    @SerializedName("followers_count")
     private int followersCount;
+
+    @SerializedName("github_login_name")
     private String githubLoginName;
+
+    @SerializedName("id")
     private String id;
+
+    @SerializedName("items_count")
     private int itemsCount;
+
+    @SerializedName("linkedin_id")
     private String linkedinId;
+
+    @SerializedName("location")
     private String location;
+
+    @SerializedName("name")
     private String name;
+
+    @SerializedName("organization")
     private String organization;
+
+    @SerializedName("permanent_id")
     private int permanentId;
+
     @SerializedName("profile_image_url")
     private String profileImageUrl;
+
+    @SerializedName("twitter_screen_name")
     private String twitterScreenName;
-    private String website_url;
+
+    @SerializedName("website_url")
+    private String websiteUrl;
 
     public User() {
     }
@@ -138,12 +168,12 @@ public class User {
         this.twitterScreenName = twitterScreenName;
     }
 
-    public String getWebsite_url() {
-        return website_url;
+    public String getWebsiteUrl() {
+        return websiteUrl;
     }
 
-    public void setWebsite_url(String website_url) {
-        this.website_url = website_url;
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
     }
 
     @Override
@@ -175,7 +205,7 @@ public class User {
             return false;
         if (twitterScreenName != null ? !twitterScreenName.equals(user.twitterScreenName) : user.twitterScreenName != null)
             return false;
-        return website_url != null ? website_url.equals(user.website_url) : user.website_url == null;
+        return websiteUrl != null ? websiteUrl.equals(user.websiteUrl) : user.websiteUrl == null;
     }
 
     @Override
@@ -194,7 +224,7 @@ public class User {
         result = 31 * result + permanentId;
         result = 31 * result + (profileImageUrl != null ? profileImageUrl.hashCode() : 0);
         result = 31 * result + (twitterScreenName != null ? twitterScreenName.hashCode() : 0);
-        result = 31 * result + (website_url != null ? website_url.hashCode() : 0);
+        result = 31 * result + (websiteUrl != null ? websiteUrl.hashCode() : 0);
         return result;
     }
 
@@ -215,7 +245,62 @@ public class User {
                 ", permanentId=" + permanentId +
                 ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", twitterScreenName='" + twitterScreenName + '\'' +
-                ", website_url='" + website_url + '\'' +
+                ", websiteUrl='" + websiteUrl + '\'' +
                 '}';
     }
+
+
+    protected User(Parcel in) {
+        description = in.readString();
+        facebookId = in.readString();
+        followeesCount = in.readInt();
+        followersCount = in.readInt();
+        githubLoginName = in.readString();
+        id = in.readString();
+        itemsCount = in.readInt();
+        linkedinId = in.readString();
+        location = in.readString();
+        name = in.readString();
+        organization = in.readString();
+        permanentId = in.readInt();
+        profileImageUrl = in.readString();
+        twitterScreenName = in.readString();
+        websiteUrl = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(description);
+        dest.writeString(facebookId);
+        dest.writeInt(followeesCount);
+        dest.writeInt(followersCount);
+        dest.writeString(githubLoginName);
+        dest.writeString(id);
+        dest.writeInt(itemsCount);
+        dest.writeString(linkedinId);
+        dest.writeString(location);
+        dest.writeString(name);
+        dest.writeString(organization);
+        dest.writeInt(permanentId);
+        dest.writeString(profileImageUrl);
+        dest.writeString(twitterScreenName);
+        dest.writeString(websiteUrl);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 }
